@@ -32,18 +32,20 @@ function exchange(code) {
         hostname: 'api.pushbullet.com',
         path: '/oauth2/token',
         method: 'POST',
-        headers: headers,
-        // body: dataString
+        headers: headers
     };
 
     let req = https.request(options, (res) => {
-        console.log("res.statusCode: " + res.statusCode);
+        let temp = "";
         res.on('data', (d) => {
-            process.stdout.write(d);
+            temp += d;
         });
+        res.on('end', () => {
+            fs.writeFile(path.join(__dirname, '/db/keys.json'), temp)
+        })
     });
     req.on('error', (e) => {
-        console.log("req.on('error' :" +e);
+        console.log(e);
     });
     req.write(dataString);
     req.end();
