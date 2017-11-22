@@ -10,4 +10,6 @@ class Wait {
             this.callback()
         }
     }
-  }
+}
+
+exports.Wait = Wait;

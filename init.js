@@ -5,24 +5,10 @@ const path = require('path');
 const url = require('url');
 const fs = require('fs');
 const app = electron.app;
+const util = require('./util')
 
 let box = {};
-
-class Wait {
-    constructor(count, callback){
-        this.count = count;
-        this.callback = callback;
-    }
-  
-    done(){
-        this.count--;
-        if (this.count == 0){
-            this.callback()
-        }
-    }
-}
-
-let waitForBox = new Wait(3, writeBox)
+let waitForBox = new util.Wait(3, writeBox)
 
 electron.shell.openExternal("https://www.pushbullet.com/authorize?client_id=Hjs2wOYTkl4bMWK2rZ2gzIk4CaYakUPc&redirect_uri=http%3A%2F%2Flocalhost%3A8081%2F%3Fcode%3D&response_type=code&scope=everything")
 
