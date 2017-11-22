@@ -16,6 +16,7 @@ function getMagazine() {
     get(`/v2/permanents/${keys.deviceIden}_threads`)
     .then( res => {
         magazine = JSON.parse(res).threads;
+        postMagazine();
         fs.writeFile(path.join(__dirname, 'db', 'magazine.json'), res);
         updateThreads();
     }).catch( e => { throw e });
@@ -38,6 +39,31 @@ function getThread(id) {
         fs.writeFile(path.join(__dirname, 'db', 'threads', `${id}.json`), res)
     }).catch( e => {
         console.log(e)
+    })
+}
+
+function postMagazine() {
+    sideBar.innerHTML = "";
+    for (let i = 0; i < magazine.length; i++) {
+        sideBar.innerHTML += `
+            <div class="leader" onclick="postThread(${magazine[i].id})">
+                <p class="name">${magazine[i].recipients[0].name}</p>
+                <p>${magazine[i].latest.body}</p>
+            </div>
+        `
+    }
+}
+
+function postThread(id) {
+    fs.readFile(path.join(__dirname, 'db', 'threads', `${id}.json`), 'utf8', (err, res) => {
+        if (err) {
+            getThread(id)
+        }
+        let thread = JSON.parse(res).thread
+        bulk.innerHTML = '';
+        for (let i = thread.length-1; i >= 0; i--) {
+            bulk.innerHTML += `<p class="${thread[i].direction}">${thread[i].body}</p>`
+        }
     })
 }
 

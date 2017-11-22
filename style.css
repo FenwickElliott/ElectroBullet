@@ -14,18 +14,29 @@ nav {
     background-color: #4ab367;
 }
 
-#magazine {
+#sideBar {
     position: absolute;
     top: 66px;
     bottom: 0;
     width: 25%;
     float: left;
-    background-color: #ecf0f0;
+    /* background-color: #ecf0f0; */
+    background-color: #95a5a6;
     overflow: auto;
 }
 
-.dark {
-    background-color: rgba(128, 128, 128, 0.75);
+div .leader {
+    /* background: red; */
+    background-color: #ecf0f0;
+}
+
+.name {
+    font-weight: bold;
+    text-align: right;
+}
+
+.outgoing {
+    text-align: right;
 }
 
 #bulk {
@@ -36,6 +47,7 @@ nav {
     width: 75%;
     bottom: 80px;
     overflow: auto;
+    background-color: #95a5a6;
 }
 
 #bulk .outgoing{
