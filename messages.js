@@ -14,28 +14,30 @@ fs.readFile(path.join(__dirname, 'db', 'keys.json'), 'utf8', (err, res) => {
     getMagazine();
 });
 
-function getMagazine() {
-    new Promise( (resolve, reject) => {
-        let magazine = get(`/v2/permanents/${keys.deviceIden}_threads`);
-        return magazine
-    }).then((magazine) => {
-        console.log(magazine);
-    });
+let magazine;
 
+function getMagazine() {
+    get(`/v2/permanents/${keys.deviceIden}_threads`)
+    .then( res => {
+        magazine = JSON.parse(res).threads;
+        fs.writeFile(path.join(__dirname, 'db', 'magazine.json'), res);
+        // updateThreads();
+    }).catch( e => { throw e });
 }
 
 function get(path) {
-    options.path = path;
-    let temp = '';
-    req = https.request(options, (res) => {
-        res.on('data', (d) => {
-            temp += d;
+    return new Promise( (resolve, reject) => {
+        options.path = path;
+        let temp = '';
+        req = https.request(options, (res) => {
+            res.on('data', (d) => {
+                temp += d;
+            });
+            res.on('end', () => {
+                resolve(temp)
+            });
+            res.on('error', (e) => { reject(e) });
         });
-        res.on('end', () => {
-            console.log(temp)
-            return temp
-        });
-        res.on('error', (e) => { throw e });
-    });
-    req.end();
-};
+        req.end();
+    })
+}
