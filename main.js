@@ -1,6 +1,6 @@
-const electron = require('electron');
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
+const {app, BrowserWindow, Menu} = require('electron');
+// const app = electron.app;
+// const BrowserWindow = electron.BrowserWindow;
 
 const http = require('http');
 const https = require('https');
@@ -23,6 +23,10 @@ app.on('ready', () => {
 })
 
 function createWindow () {
-    mainWindow = new BrowserWindow(bounds)
-    mainWindow.loadURL(`file://${__dirname}/index.html`)
+    win = new BrowserWindow(bounds)
+    win.loadURL(`file://${__dirname}/index.html`)
+    win.webContents.openDevTools();
+    win.on('closed', () => { win = null });
 }
+
+app.on('activate', () => { createWindow() });
