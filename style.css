@@ -1,0 +1,53 @@
+::-webkit-scrollbar { 
+    display: none; 
+}
+
+body{
+    height: 100%;
+    margin: 0;
+    border: 0;
+    padding: 0;
+}
+
+nav {
+    height: 65px;
+    background-color: #4ab367;
+}
+
+#magazine {
+    position: absolute;
+    top: 66px;
+    bottom: 0;
+    width: 25%;
+    float: left;
+    background-color: #ecf0f0;
+    overflow: auto;
+}
+
+.dark {
+    background-color: rgba(128, 128, 128, 0.75);
+}
+
+#bulk {
+    float: left;
+    position: absolute;
+    top: 66px;
+    right: 0;
+    width: 75%;
+    bottom: 80px;
+    overflow: auto;
+}
+
+#bulk .outgoing{
+    text-align: right;
+}
+
+#field{
+    position: absolute;
+    float: right;
+    bottom: 0;
+    height: 80px;
+    right: 0;
+    width: 75%;
+    border: 0;
+}

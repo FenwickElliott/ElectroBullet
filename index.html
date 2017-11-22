@@ -2,18 +2,18 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Hello World!</title>
+    <title>ElctroBullet</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <h1>Hello World!</h1>
-    <!-- All of the Node.js APIs are available in this renderer process. -->
-    <!-- We are using Node.js <script>document.write(process.versions.node)</script>,
-    Chromium <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>. -->
-
-    <script>
-      // You can also require other files to run in this process
-    //   require('./renderer.js')
-    </script>
+    <nav>
+        <img src="./assets/logo@2x.png" width="280px" height="58px" />
+    </nav>
+    <div id="magazine"></div>
+    <div id="bulk"></div>
+    <div id="input">
+        <imput id="field" type="text" onkeydown="if(event.keyCode == 13) send (document.getElementById('field').value)" />
+    </div>
+    <script src="messages.js" ></script>
   </body>
 </html>
