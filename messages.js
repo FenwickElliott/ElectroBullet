@@ -3,14 +3,13 @@ const fs = require('fs');
 const path = require('path');
 
 let keys;
+let magazine;
 
 fs.readFile(path.join(__dirname, 'db', 'keys.json'), 'utf8', (err, res) => {
-    if (err) { throw e }
+    if (err) { throw e };
     keys = JSON.parse(res);
     getMagazine();
 });
-
-let magazine;
 
 function getMagazine() {
     get(`/v2/permanents/${keys.deviceIden}_threads`)
@@ -20,30 +19,28 @@ function getMagazine() {
         fs.writeFile(path.join(__dirname, 'db', 'magazine.json'), res);
         updateThreads();
     }).catch( e => { throw e });
-}
+};
 
 function updateThreads() {
     magazine.forEach( thread => {
         fs.readFile(path.join(__dirname, 'db', 'threads', `${thread.id}.json`), 'utf8', (err, res) => {
             if (err || thread.latest.timestamp != JSON.parse(res).thread[0].timestamp) {
                 getThread(thread.id)
-            }
-        })
-    })
-}
+            };
+        });
+    });
+};
 
 function getThread(id) {
     get(`/v2/permanents/${keys.deviceIden}_thread_${id}`)
     .then( res => {
-        let thread = JSON.parse(res)
-        fs.writeFile(path.join(__dirname, 'db', 'threads', `${id}.json`), res)
-    }).catch( e => {
-        console.log(e)
-    })
-}
+        let thread = JSON.parse(res);
+        fs.writeFile(path.join(__dirname, 'db', 'threads', `${id}.json`), res);
+    }).catch( e => { throw e });
+};
 
 function postMagazine() {
-    sideBar.innerHTML = "";
+    sideBar.innerHTML = '';
     for (let i = 0; i < magazine.length; i++) {
         sideBar.innerHTML += `
             <div class="leader" onclick="postThread(${magazine[i].id})">
@@ -51,21 +48,21 @@ function postMagazine() {
                 <p>${magazine[i].latest.body}</p>
             </div>
         `
-    }
+    };
+    if (bulk.innerHTML == '') { postThread(magazine[0].id) };
 }
 
 function postThread(id) {
     fs.readFile(path.join(__dirname, 'db', 'threads', `${id}.json`), 'utf8', (err, res) => {
-        if (err) {
-            getThread(id)
-        }
-        let thread = JSON.parse(res).thread
+        if (err) { getThread };
+        let thread = JSON.parse(res).thread;
         bulk.innerHTML = '';
         for (let i = thread.length-1; i >= 0; i--) {
             bulk.innerHTML += `<p class="${thread[i].direction}">${thread[i].body}</p>`
-        }
-    })
-}
+        };
+        bulk.scrollTop = bulk.scrollHeight;
+    });
+};
 
 function get(path) {
     return new Promise( (resolve, reject) => {
@@ -88,5 +85,5 @@ function get(path) {
             res.on('error', (e) => { reject(e) });
         });
         req.end();
-    })
+    });
 }

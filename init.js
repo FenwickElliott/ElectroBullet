@@ -1,16 +1,15 @@
-const electron = require('electron');
+const {electron, app, shell} = require('electron');
 const http = require('http');
 const https = require('https');
 const path = require('path');
 const url = require('url');
 const fs = require('fs');
-const app = electron.app;
 const util = require('./util')
 
 let box = {};
 let waitForBox = new util.Wait(3, writeBox)
 
-electron.shell.openExternal("https://www.pushbullet.com/authorize?client_id=Hjs2wOYTkl4bMWK2rZ2gzIk4CaYakUPc&redirect_uri=http%3A%2F%2Flocalhost%3A8081%2F%3Fcode%3D&response_type=code&scope=everything")
+shell.openExternal("https://www.pushbullet.com/authorize?client_id=Hjs2wOYTkl4bMWK2rZ2gzIk4CaYakUPc&redirect_uri=http%3A%2F%2Flocalhost%3A8081%2F%3Fcode%3D&response_type=code&scope=everything")
 
 http.createServer((req, res) => {
     res.writeHead(200, {'Content-Type': 'text/html'});
@@ -50,9 +49,9 @@ function exchange(code) {
             getDevice(JSON.parse(temp).access_token);
             box.token = JSON.parse(temp).access_token;
             waitForBox.done();
-        })
+        });
     });
-    req.on('error', (e) => { throw e});
+    req.on('error', (e) => { throw e });
     req.write(dataString);
     req.end();
 }
@@ -62,7 +61,7 @@ function getMe(token) {
         hostname: 'api.pushbullet.com',
         path: '/v2/users/me',
         headers: {"Access-Token": token}
-    }
+    };
     let temp = "";
     req = https.request(options, (res) => {
         res.on('data', (d) => {
@@ -75,14 +74,14 @@ function getMe(token) {
         res.on('error', (e) => {throw e});
     });
     req.end();
-}
+};
 
 function getDevice(token) {
     let options = {
         hostname: 'api.pushbullet.com',
         path: '/v2/devices',
         headers: {"Access-Token": token}
-    }
+    };
     let temp = "";
     req = https.request(options, (res) => {
         res.on('data', (d) => {
@@ -103,7 +102,7 @@ function getDevice(token) {
 }
 
 function writeBox() {
-    fs.writeFileSync(path.join(__dirname, '/db/keys.json'), JSON.stringify(box))
+    fs.writeFileSync(path.join(__dirname, '/db/keys.json'), JSON.stringify(box));
     app.relaunch();
     app.exit();
-}
+};
