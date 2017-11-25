@@ -1,6 +1,5 @@
 const {app, BrowserWindow, Menu} = require('electron');
 
-const http = require('http');
 const https = require('https');
 const path = require('path');
 const url = require('url');

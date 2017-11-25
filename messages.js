@@ -9,6 +9,7 @@ fs.readFile(path.join(__dirname, 'db', 'keys.json'), 'utf8', (err, res) => {
     if (err) { throw e };
     keys = JSON.parse(res);
     getMagazine();
+    openWebSocket();
 });
 
 function getMagazine() {
@@ -86,4 +87,18 @@ function get(path) {
         });
         req.end();
     });
-}
+};
+
+function openWebSocket() {
+    const websocket = new WebSocket('wss://stream.pushbullet.com/websocket/' + keys.token);
+    websocket.onmessage = (e) => {
+        let data = JSON.parse(e.data);
+        if (data.push && data.push.notifications) {
+            fs.writeFile('./push', JSON.stringify(data.push))
+            getMagazine();
+            new Notification(data.push.notifications[0].title, {
+                body: data.push.notifications[0].body
+            });
+        };
+    };
+};
