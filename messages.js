@@ -4,6 +4,7 @@ const path = require('path');
 
 let keys;
 let magazine;
+let currentThread;
 
 fs.readFile(path.join(__dirname, 'db', 'keys.json'), 'utf8', (err, res) => {
     if (err) { throw e };
@@ -54,8 +55,10 @@ function postMagazine() {
 }
 
 function postThread(id) {
+    currentThread = id;
     fs.readFile(path.join(__dirname, 'db', 'threads', `${id}.json`), 'utf8', (err, res) => {
         if (err) { getThread };
+        // or if thread on file is outdated against magazine
         let thread = JSON.parse(res).thread;
         bulk.innerHTML = '';
         for (let i = thread.length-1; i >= 0; i--) {
@@ -74,9 +77,10 @@ function get(path) {
         };
         let temp = '';
         req = https.request(options, (res) => {
-            if (res.statusCode == 404) {
-                reject("404: " + path)
-            }
+            // if (res.statusCode == 404) {
+            //     reject("404: " + path)
+            // }
+            if ( res.statusCode != 200 ) { reject( res.statusCode + " on " + path ) };
             res.on('data', (d) => {
                 temp += d;
             });
@@ -102,3 +106,51 @@ function openWebSocket() {
         };
     };
 };
+
+function currentRecipient() {
+    for (let i = 0; i < magazine.length; i++) {
+        if (magazine[i].id == currentThread) {
+            console.log(magazine[i].recipients[0].address);
+            return magazine[i].recipients[0].address;
+        }
+    }
+}
+
+function send(body) {
+
+    let recipient = currentRecipient();
+
+    let sendOptions = {
+        hostname: 'api.pushbullet.com',
+        path: '/v2/ephemerals',
+        method: 'POST',
+        headers: {
+            'Access-Token': keys.token,
+            'Content-Type': 'application/json'
+        }
+    };
+
+    let payload = JSON.stringify({
+        push: {
+                conversation_iden: recipient,
+                message: body,
+                package_name: "com.pushbullet.android",
+                source_user_iden: keys.iden,
+                target_device_iden: keys.deviceIden,
+                type: "messaging_extension_reply"
+            },
+        type: "push"
+    })
+    let req = https.request(sendOptions, (res) => {
+        res.on('data', (d) =>{
+            process.stdout.write(d)
+        })
+    })
+    req.on('error', (e) =>{
+        console.log(e)
+    })
+    req.write(payload);
+
+    req.end();
+    return false
+}
