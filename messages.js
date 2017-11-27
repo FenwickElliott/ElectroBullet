@@ -1,21 +1,17 @@
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
+const get = require('./util').get;
 
 let keys;
 let magazine;
 let currentThread;
-let options = { hostname:'api.pushbullet.com' };
 
 fs.readFile(path.join(__dirname, 'db', 'keys.json'), 'utf8', (err, res) => {
     if (err) { throw e };
     keys = JSON.parse(res);
     getMagazine();
     openWebSocket();
-    options.headers = {
-        'Access-Token': keys.token,
-        'Content-Type': 'application/json'
-    }
 });
 
 function getMagazine() {
@@ -69,27 +65,6 @@ function postThread(id) {
             bulk.innerHTML += `<p class="${thread[i].direction}">${thread[i].body}</p>`
         };
         bulk.scrollTop = bulk.scrollHeight;
-    });
-};
-
-function get(path) {
-    return new Promise( (resolve, reject) => {
-        let options = {
-            hostname: 'api.pushbullet.com',
-            path: path,
-            headers: {
-                "Access-Token": keys.token,
-                'Content-Type': 'application/json'
-            }
-        };
-        let temp = '';
-        req = https.request(options, (res) => {
-            if ( res.statusCode != 200 ) { reject( res.statusCode + " on " + path ) };
-            res.on('data', (d) => { temp += d });
-            res.on('end', () => { resolve(temp) });
-            res.on('error', (e) => { reject(e) });
-        });
-        req.end();
     });
 };
 
