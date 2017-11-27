@@ -5,12 +5,17 @@ const path = require('path');
 let keys;
 let magazine;
 let currentThread;
+let options = { hostname:'api.pushbullet.com' };
 
 fs.readFile(path.join(__dirname, 'db', 'keys.json'), 'utf8', (err, res) => {
     if (err) { throw e };
     keys = JSON.parse(res);
     getMagazine();
     openWebSocket();
+    options.headers = {
+        'Access-Token': keys.token,
+        'Content-Type': 'application/json'
+    }
 });
 
 function getMagazine() {
@@ -18,8 +23,8 @@ function getMagazine() {
     .then( res => {
         magazine = JSON.parse(res).threads;
         postMagazine();
-        fs.writeFile(path.join(__dirname, 'db', 'magazine.json'), res);
         updateThreads();
+        fs.writeFile(path.join(__dirname, 'db', 'magazine.json'), res);
     }).catch( e => { throw e });
 };
 
@@ -27,7 +32,7 @@ function updateThreads() {
     magazine.forEach( thread => {
         fs.readFile(path.join(__dirname, 'db', 'threads', `${thread.id}.json`), 'utf8', (err, res) => {
             if (err || thread.latest.timestamp != JSON.parse(res).thread[0].timestamp) {
-                getThread(thread.id)
+                getThread(thread.id);
             };
         });
     });
@@ -58,7 +63,6 @@ function postThread(id) {
     currentThread = id;
     fs.readFile(path.join(__dirname, 'db', 'threads', `${id}.json`), 'utf8', (err, res) => {
         if (err) { getThread };
-        // or if thread on file is outdated against magazine
         let thread = JSON.parse(res).thread;
         bulk.innerHTML = '';
         for (let i = thread.length-1; i >= 0; i--) {
@@ -73,20 +77,16 @@ function get(path) {
         let options = {
             hostname: 'api.pushbullet.com',
             path: path,
-            headers: {"Access-Token": keys.token}
+            headers: {
+                "Access-Token": keys.token,
+                'Content-Type': 'application/json'
+            }
         };
         let temp = '';
         req = https.request(options, (res) => {
-            // if (res.statusCode == 404) {
-            //     reject("404: " + path)
-            // }
             if ( res.statusCode != 200 ) { reject( res.statusCode + " on " + path ) };
-            res.on('data', (d) => {
-                temp += d;
-            });
-            res.on('end', () => {
-                resolve(temp)
-            });
+            res.on('data', (d) => { temp += d });
+            res.on('end', () => { resolve(temp) });
             res.on('error', (e) => { reject(e) });
         });
         req.end();
@@ -98,7 +98,6 @@ function openWebSocket() {
     websocket.onmessage = (e) => {
         let data = JSON.parse(e.data);
         if (data.push && data.push.notifications) {
-            fs.writeFile('./push', JSON.stringify(data.push))
             getMagazine();
             new Notification(data.push.notifications[0].title, {
                 body: data.push.notifications[0].body
@@ -110,26 +109,15 @@ function openWebSocket() {
 function currentRecipient() {
     for (let i = 0; i < magazine.length; i++) {
         if (magazine[i].id == currentThread) {
-            console.log(magazine[i].recipients[0].address);
             return magazine[i].recipients[0].address;
-        }
-    }
-}
+        };
+    };
+};
 
 function send(body) {
-
     let recipient = currentRecipient();
-
-    let sendOptions = {
-        hostname: 'api.pushbullet.com',
-        path: '/v2/ephemerals',
-        method: 'POST',
-        headers: {
-            'Access-Token': keys.token,
-            'Content-Type': 'application/json'
-        }
-    };
-
+    options.path = '/v2/ephemerals';
+    options.method = 'POST';
     let payload = JSON.stringify({
         push: {
                 conversation_iden: recipient,
@@ -140,17 +128,11 @@ function send(body) {
                 type: "messaging_extension_reply"
             },
         type: "push"
-    })
-    let req = https.request(sendOptions, (res) => {
-        res.on('data', (d) =>{
-            process.stdout.write(d)
-        })
-    })
-    req.on('error', (e) =>{
-        console.log(e)
-    })
-    req.write(payload);
+    });
 
+    let req = https.request(options, (res) => { });
+    req.on('error', (e) => { throw e });
+    req.write(payload);
     req.end();
-    return false
-}
+    return false;
+};
