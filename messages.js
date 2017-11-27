@@ -20,8 +20,24 @@ function getMagazine() {
         magazine = JSON.parse(res).threads;
         postMagazine();
         updateThreads();
+        getImages();
         fs.writeFileSync(path.join(__dirname, 'db', 'magazine.json'), res);
     }).catch( e => { throw e });
+};
+
+function getImages() {
+    magazine.forEach( thread => {
+        thread.recipients[0].image_url
+    })
+    for (let i = 0; i < magazine.length; i++) {
+        if (magazine[i].recipients[0].image_url && ! fs.existsSync(path.join(__dirname, 'db', 'images', `${magazine[i].id}.jpg`))) {
+            get(magazine[i].recipients[0].image_url, 'dl2.pushbulletusercontent.com', 'binary')
+            .then( res => {
+                fs.writeFile(path.join(__dirname, 'db', 'images', `${magazine[i].id}.jpg`), res, 'binary');
+            })
+            .catch( (e) => { throw e });
+        };
+    };
 };
 
 function updateThreads() {
@@ -38,7 +54,7 @@ function getThread(id) {
     get(`/v2/permanents/${keys.deviceIden}_thread_${id}`)
     .then( res => {
         let thread = JSON.parse(res);
-        fs.writeFile(path.join(__dirname, 'db', 'threads', `${id}.json`), res);
+        fs.writeFileSync(path.join(__dirname, 'db', 'threads', `${id}.json`), res);
     }).catch( e => { throw e });
 };
 
