@@ -20,7 +20,7 @@ function getMagazine() {
         magazine = JSON.parse(res).threads;
         postMagazine();
         updateThreads();
-        fs.writeFile(path.join(__dirname, 'db', 'magazine.json'), res);
+        fs.writeFileSync(path.join(__dirname, 'db', 'magazine.json'), res);
     }).catch( e => { throw e });
 };
 
