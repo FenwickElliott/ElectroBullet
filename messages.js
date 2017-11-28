@@ -26,14 +26,11 @@ function getMagazine() {
 };
 
 function getavitars() {
-    // magazine.forEach( thread => {
-    //     thread.recipients[0].image_url
-    // })
     for (let i = 0; i < magazine.length; i++) {
         if (magazine[i].recipients[0].image_url && ! fs.existsSync(path.join(__dirname, 'db', 'avitars', `${magazine[i].id}.jpg`))) {
             get(magazine[i].recipients[0].image_url, 'dl2.pushbulletusercontent.com', 'binary')
             .then( res => {
-                fs.writeFile(path.join(__dirname, 'db', 'avitars', `${magazine[i].id}.jpg`), res, 'binary');
+                fs.writeFileSync(path.join(__dirname, 'db', 'avitars', `${magazine[i].id}.jpg`), res, 'binary');
             })
             .catch( (e) => { throw e });
         };
@@ -114,9 +111,16 @@ function currentRecipient() {
 };
 
 function send(body) {
+    let options = {
+        hostname: 'api.pushbullet.com',
+        path: '/v2/ephemerals',
+        method: 'POST',
+        headers: {
+            'Access-Token': keys.token,
+            'Content-Type': 'application/json'
+        }
+    };
     let recipient = currentRecipient();
-    options.path = '/v2/ephemerals';
-    options.method = 'POST';
     let payload = JSON.stringify({
         push: {
                 conversation_iden: recipient,
@@ -130,6 +134,7 @@ function send(body) {
     });
 
     let req = https.request(options, (res) => { });
+    req.on('data', (d) => {console.log(d) });
     req.on('error', (e) => { throw e });
     req.write(payload);
     req.end();
