@@ -60,9 +60,9 @@ function postMagazine() {
     sideBar.innerHTML = '';
     for (let i = 0; i < magazine.length; i++) {
         if (fs.existsSync(path.join(__dirname, 'db', 'avitars', `${magazine[i].id}.jpg`))) {
-            avitar = path.join(__dirname, 'db', 'avitars', `${magazine[i].id}.jpg`)
+            avitar = path.join(__dirname, 'db', 'avitars', `${magazine[i].id}.jpg`);
         } else {
-            avitar = './assets/generic_avitar.png'
+            avitar = './assets/generic_avitar.png';
         };
         sideBar.innerHTML += `
             <div class="leader" onclick="postThread(${magazine[i].id})">
@@ -93,11 +93,13 @@ function openWebSocket() {
     const websocket = new WebSocket('wss://stream.pushbullet.com/websocket/' + keys.token);
     websocket.onmessage = (e) => {
         let data = JSON.parse(e.data);
-        if (data.push && data.push.notifications[0]) {
-            getMagazine();
-            new Notification(data.push.notifications[0].title, {
-                body: data.push.notifications[0].body
-            });
+        if (data.push && data.push.type == 'sms_changed') {
+            getMagazine()
+            if (data.push.notifications && data.push.notifications[0]) {
+                new Notification(data.push.notifications[0].title, {
+                    body: data.push.notifications[0].body
+                });
+            };
         };
     };
 };

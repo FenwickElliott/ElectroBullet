@@ -7,7 +7,7 @@ const fs = require('fs');
 const util = require('./util')
 
 let box = {};
-let waitForBox = new util.Wait(3, writeBox)
+let waitForBox = new util.Wait(4, writeBox)
 
 shell.openExternal("https://www.pushbullet.com/authorize?client_id=Hjs2wOYTkl4bMWK2rZ2gzIk4CaYakUPc&redirect_uri=http%3A%2F%2Flocalhost%3A8081%2F%3Fcode%3D&response_type=code&scope=everything")
 
@@ -18,6 +18,12 @@ http.createServer((req, res) => {
     exchange(qs.code);
     res.end();
 }).listen(8081);
+
+fs.mkdir(path.join(__dirname, 'db'), (err, res) => {
+    waitForBox.done();
+    fs.mkdirSync(path.join(__dirname, 'db', 'threads'));
+    fs.mkdirSync(path.join(__dirname, 'db', 'avitars'));
+});
 
 function exchange(code) {
     let headers = {

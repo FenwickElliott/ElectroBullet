@@ -14,7 +14,7 @@ app.on('ready', () => {
         } else if (err) {
             throw e;
         } else {
-            createWindow()
+            createWindow();
         };
     });
 });
@@ -22,7 +22,7 @@ app.on('ready', () => {
 function createWindow () {
     win = new BrowserWindow(bounds);
     win.loadURL(`file://${__dirname}/index.html`);
-    win.webContents.openDevTools();
+    // win.webContents.openDevTools();
     win.on('closed', () => { win = null });
 };
 
