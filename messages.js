@@ -20,20 +20,20 @@ function getMagazine() {
         magazine = JSON.parse(res).threads;
         postMagazine();
         updateThreads();
-        getImages();
+        getavitars();
         fs.writeFileSync(path.join(__dirname, 'db', 'magazine.json'), res);
     }).catch( e => { throw e });
 };
 
-function getImages() {
-    magazine.forEach( thread => {
-        thread.recipients[0].image_url
-    })
+function getavitars() {
+    // magazine.forEach( thread => {
+    //     thread.recipients[0].image_url
+    // })
     for (let i = 0; i < magazine.length; i++) {
-        if (magazine[i].recipients[0].image_url && ! fs.existsSync(path.join(__dirname, 'db', 'images', `${magazine[i].id}.jpg`))) {
+        if (magazine[i].recipients[0].image_url && ! fs.existsSync(path.join(__dirname, 'db', 'avitars', `${magazine[i].id}.jpg`))) {
             get(magazine[i].recipients[0].image_url, 'dl2.pushbulletusercontent.com', 'binary')
             .then( res => {
-                fs.writeFile(path.join(__dirname, 'db', 'images', `${magazine[i].id}.jpg`), res, 'binary');
+                fs.writeFile(path.join(__dirname, 'db', 'avitars', `${magazine[i].id}.jpg`), res, 'binary');
             })
             .catch( (e) => { throw e });
         };
@@ -59,11 +59,17 @@ function getThread(id) {
 };
 
 function postMagazine() {
+    let avitar;
     sideBar.innerHTML = '';
     for (let i = 0; i < magazine.length; i++) {
+        if (fs.existsSync(path.join(__dirname, 'db', 'avitars', `${magazine[i].id}.jpg`))) {
+            avitar = path.join(__dirname, 'db', 'avitars', `${magazine[i].id}.jpg`)
+        } else {
+            avitar = './assets/generic_avitar.png'
+        };
         sideBar.innerHTML += `
             <div class="leader" onclick="postThread(${magazine[i].id})">
-                <img src="./assets/generic_avitar.png" class="avitar">
+                <img src="${avitar}" class="avitar">
                 <p class="name">${magazine[i].recipients[0].name}</p>
                 <p>${magazine[i].latest.body}</p>
             </div>
