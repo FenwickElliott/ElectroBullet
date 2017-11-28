@@ -20,19 +20,25 @@ nav {
     bottom: 0;
     width: 25%;
     float: left;
-    /* background-color: #ecf0f0; */
-    background-color: #95a5a6;
     overflow: auto;
 }
 
 div .leader {
-    /* background: red; */
-    background-color: #ecf0f0;
+    height: 90px;
+    overflow: hidden;
+    border-right: solid 1px black;
 }
 
 .name {
     font-weight: bold;
-    text-align: right;
+    float: right;
+}
+
+.avitar {
+    height: 32px;
+    width: 32px;
+    border-radius: 50%;
+    float: left'
 }
 
 .outgoing {
@@ -47,11 +53,15 @@ div .leader {
     width: 75%;
     bottom: 80px;
     overflow: auto;
-    background-color: #95a5a6;
+}
+
+#bulk .incoming {
+    margin-left: 10px;
 }
 
 #bulk .outgoing{
     text-align: right;
+    margin-right: 10px;
 }
 
 #field{
@@ -61,5 +71,5 @@ div .leader {
     height: 80px;
     right: 0;
     width: 75%;
-    border: 0;
+    border: solid 1px black;
 }

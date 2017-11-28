@@ -63,9 +63,11 @@ function postMagazine() {
     for (let i = 0; i < magazine.length; i++) {
         sideBar.innerHTML += `
             <div class="leader" onclick="postThread(${magazine[i].id})">
+                <img src="./assets/generic_avitar.png" class="avitar">
                 <p class="name">${magazine[i].recipients[0].name}</p>
                 <p>${magazine[i].latest.body}</p>
             </div>
+            <hr/>
         `
     };
     if (bulk.innerHTML == '') { postThread(magazine[0].id) };

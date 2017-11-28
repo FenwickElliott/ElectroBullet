@@ -18,7 +18,7 @@ function get(path, hostname, encoding) {
             hostname: hostname || 'api.pushbullet.com',
             path: path,
             headers: {
-                "Access-Token": keys.token,
+                'Access-Token': keys.token,
                 'Content-Type': 'application/json'
             }
         };
