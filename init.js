@@ -20,9 +20,10 @@ http.createServer((req, res) => {
 }).listen(8081);
 
 fs.mkdir(path.join(__dirname, 'db'), (err, res) => {
-    waitForBox.done();
+    fs.writeFileSync(path.join(__dirname, 'db', 'bounds.json'), '{width:800, height:600}');
     fs.mkdirSync(path.join(__dirname, 'db', 'threads'));
     fs.mkdirSync(path.join(__dirname, 'db', 'avitars'));
+    waitForBox.done();
 });
 
 function exchange(code) {

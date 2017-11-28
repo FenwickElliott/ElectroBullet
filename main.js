@@ -5,8 +5,6 @@ const path = require('path');
 const url = require('url');
 const fs = require('fs');
 
-let bounds = {width:800, height:600};
-
 app.on('ready', () => {
     fs.readFile(path.join(__dirname, 'db', 'keys.json'), 'utf8', (err, res) => {
         if (err && err.errno == -2) {
@@ -14,16 +12,24 @@ app.on('ready', () => {
         } else if (err) {
             throw e;
         } else {
-            createWindow();
+            fs.readFile(path.join(__dirname, 'db', 'bounds.json'), 'utf8', (res) => {
+                createWindow(JSON.parse(res));
+            })
         };
     });
 });
 
-function createWindow () {
+function createWindow (bounds) {
     win = new BrowserWindow(bounds);
     win.loadURL(`file://${__dirname}/index.html`);
-    // win.webContents.openDevTools();
+    win.webContents.openDevTools();
     win.on('closed', () => { win = null });
+    win.on('move', () => {
+        fs.writeFileSync(path.join(__dirname, 'db', 'bounds.json'), JSON.stringify(win.getBounds()));
+    });
+    win.on('resize', () => {
+        fs.writeFileSync(path.join(__dirname, 'db', 'bounds.json'), JSON.stringify(win.getBounds()));
+    });
 };
 
 app.on('activate', () => { createWindow() });
