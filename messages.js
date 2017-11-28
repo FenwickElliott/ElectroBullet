@@ -93,7 +93,7 @@ function openWebSocket() {
     const websocket = new WebSocket('wss://stream.pushbullet.com/websocket/' + keys.token);
     websocket.onmessage = (e) => {
         let data = JSON.parse(e.data);
-        if (data.push && data.push.notifications) {
+        if (data.push && data.push.notifications[0]) {
             getMagazine();
             new Notification(data.push.notifications[0].title, {
                 body: data.push.notifications[0].body
@@ -134,7 +134,6 @@ function send(body) {
     });
 
     let req = https.request(options, (res) => { });
-    req.on('data', (d) => {console.log(d) });
     req.on('error', (e) => { throw e });
     req.write(payload);
     req.end();
