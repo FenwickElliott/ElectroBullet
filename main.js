@@ -12,7 +12,8 @@ app.on('ready', () => {
         } else if (err) {
             throw e;
         } else {
-            fs.readFile(path.join(__dirname, 'db', 'bounds.json'), 'utf8', (res) => {
+            fs.readFile(path.join(__dirname, 'db', 'bounds.json'), 'utf8', (err, res) => {
+                if(err) { throw e };
                 createWindow(JSON.parse(res));
             })
         };
