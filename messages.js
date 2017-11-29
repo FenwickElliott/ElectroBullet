@@ -21,17 +21,17 @@ function getMagazine() {
         magazine = JSON.parse(res).threads;
         postMagazine();
         updateThreads();
-        getavitars();
+        getAvatars();
         fs.writeFileSync(path.join(__dirname, 'db', 'magazine.json'), res);
     }).catch( e => { throw e });
 };
 
-function getavitars() {
+function getAvatars() {
     for (let i = 0; i < magazine.length; i++) {
-        if (magazine[i].recipients[0].image_url && ! fs.existsSync(path.join(__dirname, 'db', 'avitars', `${magazine[i].id}.jpg`))) {
-            get(magazine[i].recipients[0].image_url, 'dl2.pushbulletusercontent.com', 'binary')
+        if (magazine[i].recipients[0].image_url && ! fs.existsSync(path.join(__dirname, 'db', 'avatars', `${magazine[i].id}.jpg`))) {
+            get(magazine[i].recipients[0].image_url, {hostname: 'dl2.pushbulletusercontent.com', encoding:'binary'})
             .then( res => {
-                fs.writeFileSync(path.join(__dirname, 'db', 'avitars', `${magazine[i].id}.jpg`), res, 'binary');
+                fs.writeFileSync(path.join(__dirname, 'db', 'avatars', `${magazine[i].id}.jpg`), res, 'binary');
             })
             .catch( (e) => { throw e });
         };
@@ -57,17 +57,17 @@ function getThread(id) {
 };
 
 function postMagazine() {
-    let avitar;
+    let avatar;
     sideBar.innerHTML = '';
     for (let i = 0; i < magazine.length; i++) {
-        if (fs.existsSync(path.join(__dirname, 'db', 'avitars', `${magazine[i].id}.jpg`))) {
-            avitar = path.join(__dirname, 'db', 'avitars', `${magazine[i].id}.jpg`);
+        if (fs.existsSync(path.join(__dirname, 'db', 'avatars', `${magazine[i].id}.jpg`))) {
+            avatar = path.join(__dirname, 'db', 'avatars', `${magazine[i].id}.jpg`);
         } else {
-            avitar = './assets/generic_avitar.png';
+            avatar = './assets/generic_avatar.png';
         };
         sideBar.innerHTML += `
             <div class="leader" onclick="postThread(${magazine[i].id})">
-                <img src="${avitar}" class="avitar">
+                <img src="${avatar}" class="avatar">
                 <p class="name">${magazine[i].recipients[0].name}</p>
                 <p>${magazine[i].latest.body}</p>
             </div>
@@ -97,7 +97,7 @@ function openWebSocket() {
     websocket.onmessage = (e) => {
         let data = JSON.parse(e.data);
         if (data.push && data.push.type == 'sms_changed') {
-            getMagazine()
+            getMagazine();
             if (data.push.notifications && data.push.notifications[0]) {
                 new Notification(data.push.notifications[0].title, {
                     body: data.push.notifications[0].body
@@ -106,35 +106,6 @@ function openWebSocket() {
         };
     };
 };
-
-// function send(body) {
-//     let options = {
-//         hostname: 'api.pushbullet.com',
-//         path: '/v2/ephemerals',
-//         method: 'POST',
-//         headers: {
-//             'Access-Token': keys.token,
-//             'Content-Type': 'application/json'
-//         }
-//     };
-//     let payload = JSON.stringify({
-//         push: {
-//                 conversation_iden: currentRecipient,
-//                 message: body,
-//                 package_name: "com.pushbullet.android",
-//                 source_user_iden: keys.iden,
-//                 target_device_iden: keys.deviceIden,
-//                 type: "messaging_extension_reply"
-//             },
-//         type: "push"
-//     });
-
-//     let req = https.request(options, (res) => { });
-//     req.on('error', (e) => { throw e });
-//     req.write(payload);
-//     req.end();
-//     return false;
-// };
 
 function send(body) {
     let payload = JSON.stringify({
@@ -149,10 +120,6 @@ function send(body) {
         type: "push"
     });
     post(payload, '/v2/ephemerals')
-    .then( (res) => {
-        console.log(res);
-    })
-    .catch( (err) => {
-        throw e;
-    });
+    .then( res => { console.log(res) })
+    .catch( e => { throw e });
 };

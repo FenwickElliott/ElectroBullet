@@ -1,13 +1,13 @@
 const {electron, app, shell} = require('electron');
 const http = require('http');
-const https = require('https');
 const path = require('path');
 const url = require('url');
 const fs = require('fs');
-const util = require('./util')
 
-let box = {};
-let waitForBox = new util.Wait(4, writeBox)
+const post = require('./util').post;
+const get = require('./util').get;
+
+let keys = {};
 
 shell.openExternal("https://www.pushbullet.com/authorize?client_id=Hjs2wOYTkl4bMWK2rZ2gzIk4CaYakUPc&redirect_uri=http%3A%2F%2Flocalhost%3A8081%2F%3Fcode%3D&response_type=code&scope=everything")
 
@@ -19,97 +19,50 @@ http.createServer((req, res) => {
     res.end();
 }).listen(8081);
 
-fs.mkdir(path.join(__dirname, 'db'), (err, res) => {
-    fs.writeFileSync(path.join(__dirname, 'db', 'bounds.json'), '{width:800, height:600}');
-    fs.mkdirSync(path.join(__dirname, 'db', 'threads'));
-    fs.mkdirSync(path.join(__dirname, 'db', 'avitars'));
-    waitForBox.done();
-});
+if (!fs.existsSync(path.join(__dirname, 'db'))) {
+    fs.mkdir(path.join(__dirname, 'db'), (err, res) => {
+        fs.mkdirSync(path.join(__dirname, 'db', 'threads'));
+        fs.mkdirSync(path.join(__dirname, 'db', 'avatars'));
+    });
+};
 
 function exchange(code) {
-    let headers = {
-        'Access-Token': '<your_access_token_here>',
-        'Content-Type': 'application/json'
-    };
 
-    let dataString = JSON.stringify({
+    let payload = JSON.stringify({
         "client_id":"Hjs2wOYTkl4bMWK2rZ2gzIk4CaYakUPc",
         "client_secret":"VGY1npt6WrkaXVeMnIhvDB0SAQLGzOlQ",
         "code":code,
         "grant_type":"authorization_code"
     });
 
-    let options = {
-        hostname: 'api.pushbullet.com',
-        path: '/oauth2/token',
-        method: 'POST',
-        headers: headers
-    };
-
-    let req = https.request(options, (res) => {
-        let temp = "";
-        res.on('data', (d) => {
-            temp += d;
-        });
-        res.on('end', () => {
-            getMe(JSON.parse(temp).access_token);
-            getDevice(JSON.parse(temp).access_token);
-            box.token = JSON.parse(temp).access_token;
-            waitForBox.done();
-        });
-    });
-    req.on('error', (e) => { throw e });
-    req.write(dataString);
-    req.end();
-}
-
-function getMe(token) {
-    let options = {
-        hostname: 'api.pushbullet.com',
-        path: '/v2/users/me',
-        headers: {"Access-Token": token}
-    };
-    let temp = "";
-    req = https.request(options, (res) => {
-        res.on('data', (d) => {
-            temp += d;
-        });
-        res.on('end', () => {
-            box.iden = JSON.parse(temp).iden
-            waitForBox.done();
-        });
-        res.on('error', (e) => {throw e});
-    });
-    req.end();
+    post(payload, '/oauth2/token', '<your_access_token_here>')
+    .then( res => {
+        keys.token = JSON.parse(res).access_token;
+        get('/v2/users/me', {token: keys.token})
+        .then( res => { getMe(res) }).catch( e => { throw e });
+        get('/v2/devices', {token: keys.token})
+        .then( res => { getDevice(res) }).catch( e => { throw e });
+    })
+    .catch( e => { throw e });
 };
 
-function getDevice(token) {
-    let options = {
-        hostname: 'api.pushbullet.com',
-        path: '/v2/devices',
-        headers: {"Access-Token": token}
-    };
-    let temp = "";
-    req = https.request(options, (res) => {
-        res.on('data', (d) => {
-            temp += d;
-        });
-        res.on('end', () => {
-            temp = JSON.parse(temp)
-            temp.devices.forEach((e) => {
-                if (e.has_sms) {
-                    box.deviceIden = e.iden;
-                    waitForBox.done();
-                }
-            })
-        });
-        res.on('error', (e) => {throw e});
-    });
-    req.end();
+function getMe(res) {
+    keys.iden = JSON.parse(res).iden;
+    if(Object.keys(keys).length == 3) { writeKeys()};
 }
 
-function writeBox() {
-    fs.writeFileSync(path.join(__dirname, '/db/keys.json'), JSON.stringify(box));
+function getDevice(res) {
+    JSON.parse(res).devices.forEach( d => {
+        if (d.has_sms) {
+            keys.deviceIden = d.iden;
+            if(Object.keys(keys).length == 3) { writeKeys()};
+        };
+    });
+};
+
+
+function writeKeys() {
+    fs.writeFileSync(path.join(__dirname, '/db/keys.json'), JSON.stringify(keys));
     app.relaunch();
     app.exit();
 };

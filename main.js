@@ -1,6 +1,5 @@
 const {app, BrowserWindow, Menu} = require('electron');
-
-const https = require('https');
+// const https = require('https');
 const path = require('path');
 const url = require('url');
 const fs = require('fs');
@@ -13,9 +12,12 @@ app.on('ready', () => {
             throw e;
         } else {
             fs.readFile(path.join(__dirname, 'db', 'bounds.json'), 'utf8', (err, res) => {
-                if(err) { throw e };
-                createWindow(JSON.parse(res));
-            })
+                if (err) {
+                    createWindow({width:800, height:600});
+                } else {
+                    createWindow(JSON.parse(res));
+                };
+            });
         };
     });
 });

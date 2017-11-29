@@ -1,31 +1,19 @@
-class Wait {
-    constructor(count, callback) {
-        this.count = count;
-        this.callback = callback;
-    };
-  
-    done() {
-        this.count--;
-        if (this.count == 0) {
-            this.callback();
-        };
-    };
-};
+const https = require('https');
 
-function get(path, hostname, encoding) {
+function get(path, params = {}) {
     return new Promise( (resolve, reject) => {
         let options = {
-            hostname: hostname || 'api.pushbullet.com',
+            hostname: params.hostname || 'api.pushbullet.com',
             path: path,
             headers: {
-                'Access-Token': keys.token,
+                'Access-Token': params.token || keys.token,
                 'Content-Type': 'application/json'
             }
         };
         let temp = '';
         req = https.request(options, (res) => {
             if ( res.statusCode != 200 ) { reject( res.statusCode + " on " + path ) };
-            if (encoding) { res.setEncoding(encoding) };
+            if (params.encoding) { res.setEncoding(params.encoding) };
             res.on('data', (d) => { temp += d });
             res.on('end', () => { resolve(temp) });
             res.on('error', (e) => { reject(e) });
@@ -56,6 +44,5 @@ function post(payload, path, token) {
     });
 };
 
-exports.Wait = Wait;
 exports.get = get;
 exports.post = post;
