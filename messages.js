@@ -80,7 +80,7 @@ function postMagazine() {
 function postThread(id) {
     // currentThread = magazine.find(x => x.id == id);
     // currentThreadID = (magazine.find(x => x.id == id)).id;
-    currentRecipient = (magazine.find(x => x.id == id)).recipients[0].address
+    currentRecipient = (magazine.find(x => x.id == id)).recipients[0].number
     fs.readFile(path.join(__dirname, 'db', 'threads', `${id}.json`), 'utf8', (err, res) => {
         if (err) { getThread() };
         let thread = JSON.parse(res).thread;
