@@ -34,5 +34,28 @@ function get(path, hostname, encoding) {
     });
 };
 
+function post(payload, path, token) {
+    return new Promise( (resolve, reject) => {
+        let options = {
+            hostname: 'api.pushbullet.com',
+            path: path,
+            method: 'POST',
+            headers: {
+                'Access-Token': token || keys.token,
+                'Content-Type': 'application/json'
+            }
+        };
+        let temp = '';
+        let req = https.request(options, (res) => {
+            res.on('data', (d) => { temp += d });
+            res.on('end', () => { resolve(temp) });
+            res.on('error', (e) => { reject(e) });
+        });
+        req.write(payload);
+        req.end();
+    });
+};
+
 exports.Wait = Wait;
 exports.get = get;
+exports.post = post;

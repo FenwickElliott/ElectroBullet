@@ -2,6 +2,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const get = require('./util').get;
+const post = require('./util').post;
 
 let keys;
 let magazine;
@@ -106,16 +107,36 @@ function openWebSocket() {
     };
 };
 
+// function send(body) {
+//     let options = {
+//         hostname: 'api.pushbullet.com',
+//         path: '/v2/ephemerals',
+//         method: 'POST',
+//         headers: {
+//             'Access-Token': keys.token,
+//             'Content-Type': 'application/json'
+//         }
+//     };
+//     let payload = JSON.stringify({
+//         push: {
+//                 conversation_iden: currentRecipient,
+//                 message: body,
+//                 package_name: "com.pushbullet.android",
+//                 source_user_iden: keys.iden,
+//                 target_device_iden: keys.deviceIden,
+//                 type: "messaging_extension_reply"
+//             },
+//         type: "push"
+//     });
+
+//     let req = https.request(options, (res) => { });
+//     req.on('error', (e) => { throw e });
+//     req.write(payload);
+//     req.end();
+//     return false;
+// };
+
 function send(body) {
-    let options = {
-        hostname: 'api.pushbullet.com',
-        path: '/v2/ephemerals',
-        method: 'POST',
-        headers: {
-            'Access-Token': keys.token,
-            'Content-Type': 'application/json'
-        }
-    };
     let payload = JSON.stringify({
         push: {
                 conversation_iden: currentRecipient,
@@ -127,10 +148,11 @@ function send(body) {
             },
         type: "push"
     });
-
-    let req = https.request(options, (res) => { });
-    req.on('error', (e) => { throw e });
-    req.write(payload);
-    req.end();
-    return false;
+    post(payload, '/v2/ephemerals')
+    .then( (res) => {
+        console.log(res);
+    })
+    .catch( (err) => {
+        throw e;
+    });
 };
