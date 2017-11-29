@@ -77,9 +77,11 @@ function postMagazine() {
 }
 
 function postThread(id) {
-    currentThread = id;
+    // currentThread = magazine.find(x => x.id == id);
+    // currentThreadID = (magazine.find(x => x.id == id)).id;
+    currentRecipient = (magazine.find(x => x.id == id)).recipients[0].address
     fs.readFile(path.join(__dirname, 'db', 'threads', `${id}.json`), 'utf8', (err, res) => {
-        if (err) { getThread };
+        if (err) { getThread() };
         let thread = JSON.parse(res).thread;
         bulk.innerHTML = '';
         for (let i = thread.length-1; i >= 0; i--) {
@@ -104,14 +106,6 @@ function openWebSocket() {
     };
 };
 
-function currentRecipient() {
-    for (let i = 0; i < magazine.length; i++) {
-        if (magazine[i].id == currentThread) {
-            return magazine[i].recipients[0].address;
-        };
-    };
-};
-
 function send(body) {
     let options = {
         hostname: 'api.pushbullet.com',
@@ -122,10 +116,9 @@ function send(body) {
             'Content-Type': 'application/json'
         }
     };
-    let recipient = currentRecipient();
     let payload = JSON.stringify({
         push: {
-                conversation_iden: recipient,
+                conversation_iden: currentRecipient,
                 message: body,
                 package_name: "com.pushbullet.android",
                 source_user_iden: keys.iden,
