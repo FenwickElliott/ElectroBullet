@@ -40,11 +40,11 @@ function exchange(code) {
     .then( res => {
         keys.token = JSON.parse(res).access_token;
         get('/v2/users/me', {token: keys.token})
-        .then( res => { getMe(res) }).catch( e => { throw e });
+        .then( res => { getMe(res) }).catch( e => { console.log(e) });
         get('/v2/devices', {token: keys.token})
-        .then( res => { getDevice(res) }).catch( e => { throw e });
+        .then( res => { getDevice(res) }).catch( e => { console.log(e) });
     })
-    .catch( e => { throw e });
+    .catch( e => { console.log(e) });
 };
 
 function getMe(res) {

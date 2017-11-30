@@ -9,7 +9,7 @@ app.on('ready', () => {
         if (err && err.errno == -2) {
             require('./init');
         } else if (err) {
-            throw e;
+            console.log(err);
         } else {
             fs.readFile(path.join(__dirname, 'db', 'bounds.json'), 'utf8', (err, res) => {
                 if (err) {

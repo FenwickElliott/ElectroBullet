@@ -10,7 +10,7 @@ let magazine;
 let currentThread;
 
 fs.readFile(path.join(__dirname, 'db', 'keys.json'), 'utf8', (err, res) => {
-    if (err) { throw e };
+    if (err) { console.log(err) };
     keys = JSON.parse(res);
     getMagazine();
     openWebSocket();
@@ -24,7 +24,7 @@ function getMagazine() {
         updateThreads();
         getAvatars();
         fs.writeFileSync(path.join(__dirname, 'db', 'magazine.json'), res);
-    }).catch( e => { throw e });
+    }).catch( e => { console.log(e) });
 };
 
 function getAvatars() {
@@ -34,7 +34,7 @@ function getAvatars() {
             .then( res => {
                 fs.writeFileSync(path.join(__dirname, 'db', 'avatars', `${magazine[i].id}.jpg`), res, 'binary');
             })
-            .catch( (e) => { throw e });
+            .catch( (e) => { console.log(e) });
         };
     };
 };
@@ -54,7 +54,7 @@ function getThread(id) {
     .then( res => {
         let thread = JSON.parse(res);
         fs.writeFileSync(path.join(__dirname, 'db', 'threads', `${id}.json`), res);
-    }).catch( e => { throw e });
+    }).catch( e => { console.log(e) });
 };
 
 function postMagazine() {
@@ -122,5 +122,5 @@ function send(body) {
     });
     post(payload, '/v2/ephemerals')
     .then( res => { console.log(res) })
-    .catch( e => { throw e });
+    .catch( e => { console.log(e) });
 };
