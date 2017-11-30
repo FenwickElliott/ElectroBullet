@@ -40,13 +40,13 @@ function getAvatars() {
 };
 
 function updateThreads() {
-    magazine.forEach( thread => {
-        fs.readFile(path.join(__dirname, 'db', 'threads', `${thread.id}.json`), 'utf8', (err, res) => {
-            if (err || thread.latest.timestamp != JSON.parse(res).thread[0].timestamp) {
-                getThread(thread.id);
+    for(let i = 0; i < magazine.length; i++) {
+        fs.readFile(path.join(__dirname, 'db', 'threads', `${magazine[i].id}.json`), 'utf8', (err, res) => {
+            if (err || magazine[i].latest.timestamp != JSON.parse(res).thread[0].timestamp) {
+                getThread(magazine[i].id);
             };
         });
-    });
+    };
 };
 
 function getThread(id) {
@@ -54,6 +54,7 @@ function getThread(id) {
     .then( res => {
         let thread = JSON.parse(res);
         fs.writeFileSync(path.join(__dirname, 'db', 'threads', `${id}.json`), res);
+        if (id == currentThread.id) { postThread(id) };
     }).catch( e => { console.log(e) });
 };
 
@@ -98,7 +99,6 @@ function openWebSocket() {
         if (data.push && data.push.type == 'sms_changed') {
             getMagazine();
             if (data.push.notifications && data.push.notifications[0]) {
-                if(data.push.notifications[0].thread_id == currentThread.id) { postThread(currentThread.id) };
                 new Notification(data.push.notifications[0].title, {
                     body: data.push.notifications[0].body
                 });
