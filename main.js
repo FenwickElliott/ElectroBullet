@@ -1,3 +1,4 @@
+"use strict";
 const {app, BrowserWindow, Menu} = require('electron');
 const path = require('path');
 const url = require('url');
@@ -22,7 +23,7 @@ app.on('ready', () => {
 });
 
 function createWindow (bounds) {
-    win = new BrowserWindow(bounds);
+    let win = new BrowserWindow(bounds);
     win.loadURL(`file://${__dirname}/index.html`);
     // win.webContents.openDevTools();
     win.on('closed', () => { win = null });

@@ -1,3 +1,4 @@
+"use strict";
 const {electron, app, shell} = require('electron');
 const http = require('http');
 const path = require('path');
@@ -49,7 +50,7 @@ function exchange(code) {
 function getMe(res) {
     keys.iden = JSON.parse(res).iden;
     if(Object.keys(keys).length == 3) { writeKeys()};
-}
+};
 
 function getDevice(res) {
     JSON.parse(res).devices.forEach( d => {
