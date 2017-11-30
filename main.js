@@ -39,6 +39,11 @@ function createWindow (bounds) {
         submenu: [
             { label: 'About Application', selector: 'orderFrontStandardAboutPanel:' },
             { type: 'separator' },
+            { label: 'Purge all user data!', click: () => {
+                require('./util').purge(path.join(__dirname, 'db'));
+                app.quit();
+            }},
+            { type: 'separator' },
             { label: 'Quit', accelerator: 'Command+Q', click: () => { app.quit() }}
         ]}, {
         label: 'Edit',
