@@ -49,21 +49,49 @@ function exchange(code) {
 
 function getMe(res) {
     keys.iden = JSON.parse(res).iden;
-    if(Object.keys(keys).length == 3) { writeKeys()};
+    if(Object.keys(keys).length == 3) { writeKeys() };
 };
 
 function getDevice(res) {
     JSON.parse(res).devices.forEach( d => {
         if (d.has_sms) {
             keys.deviceIden = d.iden;
-            if(Object.keys(keys).length == 3) { writeKeys()};
+            if(Object.keys(keys).length == 3) { writeKeys() };
+            getMagazine();
         };
     });
+};
+
+function getMagazine() {
+    get(`/v2/permanents/${keys.deviceIden}_threads`, {token: keys.token})
+    .then(res => {
+        getThreads(res);
+        fs.writeFileSync(path.join(__dirname, 'db', 'magazine.json'), res);
+    }).catch( e => { console.log(e) });
+}
+
+function getThreads(res) {
+    let c = 0
+    let magazine = JSON.parse(res).threads;
+    for (let i = 0; i < magazine.length; i++) {
+        get(`/v2/permanents/${keys.deviceIden}_thread_${magazine[i].id}`, {token: keys.token})
+        .then( res => {
+            fs.writeFile(path.join(__dirname, 'db', 'threads', `${magazine[i].id}.json`), res, (err, res) => {
+                c++;
+                if (c == magazine.length) { app.relaunch(); app.exit(); }
+            });
+        }).catch ( e => { console.log(e) });
+        if (magazine[i].recipients[0].image_url) {
+            get(magazine[i].recipients[0].image_url, {token: keys.token, hostname: 'dl2.pushbulletusercontent.com', encoding:'binary'})
+            .then( res => {
+                fs.writeFile(path.join(__dirname, 'db', 'avatars', `${magazine[i].id}.jpg`), res, 'binary', (err, res) => {
+                });
+            }).catch( e => { console.log(e) });
+        };
+    };
 };
 
 
 function writeKeys() {
     fs.writeFileSync(path.join(__dirname, '/db/keys.json'), JSON.stringify(keys));
-    app.relaunch();
-    app.exit();
 };
