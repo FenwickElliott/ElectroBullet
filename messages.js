@@ -71,7 +71,7 @@ function postMagazine() {
             <div class="leader" onclick="postThread(${magazine[i].id})">
                 <img src="${avatar}" class="avatar">
                 <p class="name">${magazine[i].recipients[0].name}</p>
-                <p>${magazine[i].latest.body}</p>
+                <p class="preview">${magazine[i].latest.body}</p>
             </div>
             <hr/>
         `
