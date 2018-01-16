@@ -11,7 +11,7 @@ In order to use ElectroBullet, you must have a PushBullet account and have the a
 When run for the first time ElectroBullet will open your browser to the PushBullet OAuth2 page for authorization. Upon approval ElectroBullet will save your API token and relaunch.
 
 ## To compile yourself
-* Clone this reop: `git clone https://github.com/FenwickElliott/ElectroBullet.git`
+* Clone this repo: `git clone https://github.com/FenwickElliott/ElectroBullet.git`
 * Change into the root directory: `cd ElectroBullet`
 * Install the dependencies: `npm install`
 * Start it up: `electron .`
