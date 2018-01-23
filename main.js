@@ -3,6 +3,7 @@ const {app, BrowserWindow, Menu} = require('electron');
 const path = require('path');
 const url = require('url');
 const fs = require('fs');
+let win;
 
 app.on('ready', () => {
     fs.readFile(path.join(__dirname, 'db', 'keys.json'), 'utf8', (err, res) => {
