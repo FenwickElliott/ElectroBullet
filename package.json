@@ -1,6 +1,6 @@
 {
   "name": "ElectroBullet",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "An Electron client for PushBullet",
   "main": "main.js",
   "scripts": {
@@ -11,7 +11,7 @@
   "author": "Charles Fenwick Elliott",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^1.8.2",
-    "electron-packager": "^11.0.1"
+    "electron": "^2.0.2",
+    "electron-packager": "^12.1.0"
   }
 }
